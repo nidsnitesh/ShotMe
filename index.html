@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>game</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+<p id='scoreCard'>
+	Currunt score: <span id='score'>0</span>
+	&nbsp; &nbsp; 
+	High Score: <span id='topScore'></span>
+</p>
+<div class='box' id='box'>
+	<p class='heading'>
+		Click here to start the game
+	</p>
+	<button id='start' onclick="startGame()">START</button>
+</div>
+
+
+
+<script type="text/javascript">
+
+function createElement(tagName, id) {
+	var elem = document.createElement(tagName);
+	if(id) {
+		elem.id = id
+	}
+	return elem
+} 
+
+function getElem(id) {
+	return document.getElementById(id);
+}
+
+function appendChild(id, node){
+	var parent =  document.getElementById(id)
+	parent.appendChild(node)
+}
+
+function removeChild(id) {
+	var node = document.getElementById(id);
+ 	node.parentNode.removeChild(node);
+ 	return true
+}
+
+var score = 0
+var highScore  = 0
+
+async function startGame() {
+      var s1 =  removeChild('box')
+      var s2 =  handleHighScore()
+      var s3 =  createCicle()
+      var s4 = onLoad()
+      await Promise.all([s1, s2, s3, s4]);
+      clickHandler();
+	
+}
+
+function createCicle(){
+	// circle 1
+	var a = createElement('div', 'a')
+	a.className = 'parent'
+	document.body.appendChild(a)
+	var child1 = createElement('div', 'child1')
+	child1.className= 'child'
+	appendChild('a', child1)
+
+	// circle 2
+	var b = createElement('div', 'b')
+	b.className = 'parent'
+	document.body.appendChild(b)
+	var child2 = createElement('div', 'child2')
+	child2.className= 'child'
+	appendChild('b', child2)
+	randomPostion(a)
+	randomPostion(b)
+}
+
+
+
+
+function clickHandler () {
+	console.log('added')
+	document.addEventListener('click', function (event) {
+	    if (event.target.closest('.parent')){
+	    	blink(event.target)
+	        handleScore()
+	        handleHighScore()
+	    } else {
+	    	if(event.target.id !== 'start'){
+	    		endGame()
+	    	}
+	    }
+	});
+}
+
+function handleScore() {
+	score++
+	getElem('score').innerHTML = score 
+}
+
+function handleHighScore() {
+	let localStorageScore = localStorage.highScore
+	if(localStorageScore){
+		highScore = localStorageScore ? localStorageScore : score
+		localStorage.setItem('highScore' , highScore)
+	} 
+	getElem('topScore').innerHTML = highScore 
+	return true
+	
+}
+
+function blink(elem) {
+	
+	setTimeout(function() {
+      	elem.style.background = 'red';
+      	setTimeout(function() {
+      	elem.style.background = 'white';
+		}, 200);
+   }, 100);
+	  
+}
+
+
+
+function onLoad() {
+ 	animateDiv(getElem('a'));
+    animateDiv(getElem('b'));
+    return true
+}
+
+function makeNewPosition() {
+    var h = screen.height - 200;
+    var w = screen.width - 200;
+    var nh = Math.floor(Math.random() * h);
+    var nw = Math.floor(Math.random() * w);
+    return [nh,nw];    
+    Z
+}
+
+function animateDiv(elem) {
+	function frame() {
+		randomPostion(elem)
+    }
+    setInterval(frame, 1000);
+    
+}
+
+function randomPostion(elem) {
+	var newq = makeNewPosition()
+    elem.style.top = newq[0] + 'px'
+    elem.style.left = newq[1] + 'px' 
+      
+}
+
+function endGame() {
+	removeChild('a')
+	removeChild('b')
+	removeChild('scoreCard')
+	var box = createElement('div', 'box')
+	box.className = 'box'
+	document.body.appendChild(box)
+	var title = createElement('p', 'title')
+	title.innerHTML = score > highScore ? 'Oh whoo!! you win' : 'oh! you lost'
+	appendChild('box',title)
+
+
+	var yourScore = createElement('p', 'yourScore')
+	yourScore.innerHTML = 'Your Score : ' + score
+	appendChild('box',yourScore)
+	var topScore = createElement('p', 'topScore')
+	topScore.innerHTML = 'High Score : ' + highScore
+	appendChild('box', topScore)
+
+}
+
+
+
+
+</script>
+</body>
+</html>
